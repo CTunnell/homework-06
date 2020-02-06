@@ -217,7 +217,8 @@
 
                 var temp = parseInt(response.main.temp)
                 var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
-                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY") + ") (" + response.weather[0].main + ")")
+                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY"))
+                $(".city-header").append(img)
                 $("#current-temp").text("Temperature: " + tempFahrenheit.toFixed(2))
                 $("#current-humidity").text("Humidity: " + JSON.stringify(response.main.humidity))
                 $("#current-windspeed").text("Wind speed: " + JSON.stringify(response.wind.speed))
