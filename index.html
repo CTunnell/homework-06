@@ -92,7 +92,7 @@
 
                 var temp = parseInt(response.main.temp)
                 var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
-                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY"))
+                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY") + ")")
                 $(".city-header").append(img)
 
                 $("#current-temp").text("Temperature: " + tempFahrenheit.toFixed(2))
@@ -165,7 +165,7 @@
                     weatherCardBody.append(img)
                     weatherCardBody.append(cardBr)
 
-                    tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + "degrees")
+                    tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + " degrees")
                     weatherCardBody.append(tempP)
                     weatherCardBody.append(cardBr)
 
@@ -217,10 +217,10 @@
 
                 var temp = parseInt(response.main.temp)
                 var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
-                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY"))
+                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY") + ")")
                 $(".city-header").append(img)
                 $("#current-temp").text("Temperature: " + tempFahrenheit.toFixed(2))
-                $("#current-humidity").text("Humidity: " + JSON.stringify(response.main.humidity))
+                $("#current-humidity").text("Humidity: " + JSON.stringify(response.main.humidity) + "%")
                 $("#current-windspeed").text("Wind speed: " + JSON.stringify(response.wind.speed))
 
                 var longitude = response.coord.lon
@@ -291,7 +291,7 @@
                         weatherCardBody.append(img)
                         weatherCardBody.append(cardBr)
                         
-                        tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + "degrees")
+                        tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + " degrees")
                         weatherCardBody.append(tempP)
                         weatherCardBody.append(cardBr)
                         
