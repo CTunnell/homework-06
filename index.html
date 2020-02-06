@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css" />
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron jumbotron-fluid">
+                    <h1 class="display-4">Weather Dashboard</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 id="search-title">Search for a City:</h3>
+                        <input type="search" name=" " id="keyword-input" class="w-75 mb-3">
+
+
+                        <br>
+                        <button>Search</button>
+                        <br>
+                        <span class="city-buttons"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="city-header"></h3>
+                        <p class="current-conditions">
+                            <span id="current-temp"></span> <br>
+                            <span id="current-humidity"></span> <br>
+                            <span id="current-windspeed"></span><br>
+                            <span id="current-uv"></span><br>
+                        </p>
+                        <p class="future-conditions"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="container">
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+    <script type="text/javascript">
+
+
+
+
+        function currentWeather() {
+            var keyword = $("#keyword-input").val().trim();
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + keyword + "&appid=d4f5fa9a43ae65d7f360e1df50f31ff0"
+
+            console.log(keyword)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(keyword)
+                console.log(response)
+
+                var cityButton = $("<button>")
+                cityButton.addClass("city-button")
+
+                cityButton.attr("data-name", response.name)
+                cityButton.text(response.name)
+                var buttonsBr = $("<br>")
+                $(".city-buttons").prepend(cityButton)
+                $(".city-buttons").prepend(buttonsBr)
+
+                var img = $("<img>")
+                var imgIcon = response.weather[0].icon
+                var imgURL = "http://openweathermap.org/img/wn/" + imgIcon + "@2x.png"
+                console.log(imgURL)
+                img.attr("src", imgURL)
+
+
+                var temp = parseInt(response.main.temp)
+                var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
+                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY"))
+                $(".city-header").append(img)
+
+                $("#current-temp").text("Temperature: " + tempFahrenheit.toFixed(2))
+                $("#current-humidity").text("Humidity: " + JSON.stringify(response.main.humidity) + "%")
+                $("#current-windspeed").text("Wind speed: " + JSON.stringify(response.wind.speed))
+
+                var longitude = response.coord.lon
+                var latitude = response.coord.lat
+                function currentUV() {
+                    console.log(longitude)
+                    console.log(latitude)
+                    var queryURL = "http://api.openweathermap.org/data/2.5/uvi?appid=d4f5fa9a43ae65d7f360e1df50f31ff0&lat=" + latitude + "&lon=" + longitude
+
+                    $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    }).then(function (response) {
+                        console.log(response)
+                        $("#current-uv").text("UV index: " + JSON.stringify(response.value))
+                    })
+
+                }
+                currentUV()
+
+
+
+            })
+        }
+
+        function fiveDayWeather() {
+            var keyword = $("#keyword-input").val().trim();
+            var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + keyword + "&appid=d4f5fa9a43ae65d7f360e1df50f31ff0"
+
+            console.log(keyword)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(keyword)
+                console.log(response)
+
+                for (i = 4; i < 39; i = i + 8) {
+                    var weatherCard = $("<div>")
+                    weatherCard.addClass("card")
+                    var weatherCardBody = $("<div>")
+                    weatherCardBody.addClass("card-body")
+                    $(".future-conditions").append(weatherCard)
+                    weatherCard.append(weatherCardBody)
+
+
+                    var dateP = $("<p>") 
+                    var weatherIcon = $("<img>") 
+                    var tempP = $("<p>") 
+                    var humidityP = $("<p>"); 
+                    var cardBr = $("<br>")
+
+                    var img = $("<img>")
+                    var imgIcon = response.list[i].weather[0].icon
+                    var imgURL = "http://openweathermap.org/img/wn/" + imgIcon + "@2x.png"
+                    console.log(imgURL)
+                    img.attr("src", imgURL)
+
+                    var temp = parseInt(response.list[i].main.temp)
+                    var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
+
+                    dateP.text(JSON.stringify(response.list[i].dt_txt))
+                    weatherCardBody.append(dateP)
+                    weatherCardBody.append(cardBr)
+
+                    weatherCardBody.append(img)
+                    weatherCardBody.append(cardBr)
+
+                    tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + "degrees")
+                    weatherCardBody.append(tempP)
+                    weatherCardBody.append(cardBr)
+
+                    humidityP.text(JSON.stringify(response.list[i].main.humidity) + "%")
+                    weatherCardBody.append(humidityP)
+
+                }
+            })
+        }
+
+
+        $("button").on("click", function () {
+            currentWeather()
+            $(".future-conditions").empty()
+            fiveDayWeather()
+        });
+
+
+
+
+
+        $(document).on("click", ".city-button", function () {
+            console.log($(this).attr("data-name"))
+
+            var keyword = $(this).attr("data-name");
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + keyword + "&appid=d4f5fa9a43ae65d7f360e1df50f31ff0"
+
+            console.log(keyword)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(response)
+
+                var cityButton = $("<button>")
+                cityButton.addClass("city-button")
+
+                cityButton.attr("data-name", response.name)
+                cityButton.text(response.name)
+                var buttonsBr = $("<br>")
+                $(".city-buttons").prepend(cityButton)
+                $(".city-buttons").prepend(buttonsBr)
+
+                var img = $("<img>")
+                var imgIcon = response.weather[0].icon
+                var imgURL = "http://openweathermap.org/img/wn/" + imgIcon + "@2x.png"
+                console.log(imgURL)
+                img.attr("src", imgURL)
+
+                var temp = parseInt(response.main.temp)
+                var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
+                $(".city-header").text(response.name + " (" + moment().format("M/D/YYYY") + ") (" + response.weather[0].main + ")")
+                $("#current-temp").text("Temperature: " + tempFahrenheit.toFixed(2))
+                $("#current-humidity").text("Humidity: " + JSON.stringify(response.main.humidity))
+                $("#current-windspeed").text("Wind speed: " + JSON.stringify(response.wind.speed))
+
+                var longitude = response.coord.lon
+                var latitude = response.coord.lat
+                function currentUV() {
+                    console.log(longitude)
+                    console.log(latitude)
+                    var queryURL = "http://api.openweathermap.org/data/2.5/uvi?appid=d4f5fa9a43ae65d7f360e1df50f31ff0&lat=" + latitude + "&lon=" + longitude
+
+                    $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    }).then(function (response) {
+                        console.log(response)
+                        $("#current-uv").text("UV index: " + JSON.stringify(response.value))
+                    })
+
+                }
+                currentUV()
+
+
+
+            })
+
+
+            function buttonFiveDay() {
+
+
+                var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + keyword + "&appid=d4f5fa9a43ae65d7f360e1df50f31ff0"
+
+                console.log(keyword)
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+                    console.log(keyword)
+                    console.log(response)
+
+                    for (i = 4; i < 39; i = i + 8) {
+
+                        var weatherCard = $("<div>")
+                        weatherCard.addClass("card weather-card")
+                        var weatherCardBody = $("<div>")
+                        weatherCardBody.addClass("card-body")
+                        $(".future-conditions").append(weatherCard)
+                        weatherCard.append(weatherCardBody)
+
+
+                        var dateP = $("<p>") 
+                        var weatherIcon = $("<img>") 
+                        var tempP = $("<p>") 
+                        var humidityP = $("<p>"); 
+                        var cardBr = $("<br>")
+
+                        var img = $("<img>")
+                        var imgIcon = response.list[i].weather[0].icon
+                        var imgURL = "http://openweathermap.org/img/wn/" + imgIcon + "@2x.png"
+                        console.log(imgURL)
+                        img.attr("src", imgURL)
+
+                        var temp = parseInt(response.list[i].main.temp)
+                        var tempFahrenheit = ((temp - 273.15) * 1.8) + 32
+
+                        dateP.text(JSON.stringify(response.list[i].dt_txt))
+                        weatherCardBody.append(dateP)
+                        weatherCardBody.append(cardBr)
+                        
+                        weatherCardBody.append(img)
+                        weatherCardBody.append(cardBr)
+                        
+                        tempP.text(JSON.stringify(tempFahrenheit.toFixed(2)) + "degrees")
+                        weatherCardBody.append(tempP)
+                        weatherCardBody.append(cardBr)
+                        
+                        humidityP.text(JSON.stringify(response.list[i].main.humidity) + "%")
+                        weatherCardBody.append(humidityP)
+                        
+
+                    }
+                })
+            }
+
+
+
+            $(".future-conditions").empty()
+            buttonFiveDay()
+
+        })
+
+
+
+    </script>
+</body>
+
+</html>
